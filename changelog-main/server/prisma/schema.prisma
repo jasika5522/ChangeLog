@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String    @id @default(uuid())
+  createdAt      DateTime  @default(now())
+  name           String
+  email          String    @unique
+  password       String
+  image          String?
+  currentProduct Int       @default(0)
+  products       Product[]
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  name        String
+  description String?
+  logo        String?
+  domainName  String   @unique
+  updates     Update[]
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model Update {
+  id           String     @id @default(uuid())
+  createdAt    DateTime   @default(now())
+  title        String
+  body         String
+  version      String?
+  type         Type       @default(FEATURE)
+  isPublic     Boolean?   @default(false)
+  feedbackFlag Boolean?   @default(false)
+  featureImage String?
+  socialImage  String?
+  feedback     Feedback[]
+  productId    String
+  product      Product    @relation(fields: [productId], references: [id])
+}
+
+enum Type {
+  FEATURE
+  BUGFIX
+  SECURITY
+  PERFORMANCE
+}
+
+enum Feedback {
+  SAD
+  NEUTRAL
+  HAPPY
+}
